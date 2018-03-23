@@ -25,7 +25,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CoprocessorEnvironment;
 import org.apache.hadoop.hbase.DoNotRetryIOException;
-import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.HRegionInfo;
 import org.apache.hadoop.hbase.KeyValue;
@@ -45,7 +44,6 @@ import org.apache.hadoop.hbase.regionserver.ScannerContextUtil;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.htrace.Span;
 import org.apache.htrace.Trace;
-import org.apache.phoenix.compile.ScanRanges;
 import org.apache.phoenix.execute.TupleProjector;
 import org.apache.phoenix.expression.Expression;
 import org.apache.phoenix.expression.KeyValueColumnExpression;
@@ -313,42 +311,7 @@ abstract public class BaseScannerRegionObserver extends BaseRegionObserver {
             if (!isRegionObserverFor(scan)) {
                 return s;
             }
-            boolean success = false;
-            // Save the current span. When done with the child span, reset the span back to
-            // what it was. Otherwise, this causes the thread local storing the current span
-            // to not be reset back to null causing catastrophic infinite loops
-            // and region servers to crash. See https://issues.apache.org/jira/browse/PHOENIX-1596
-            // TraceScope can't be used here because closing the scope will end up calling
-            // currentSpan.stop() and that should happen only when we are closing the scanner.
-            final Span savedSpan = Trace.currentSpan();
-            final Span child = Trace.startSpan(SCANNER_OPENED_TRACE_INFO, savedSpan).getSpan();
-            try {
-                RegionScanner scanner = doPostScannerOpen(c, scan, s);
-                scanner = new DelegateRegionScanner(scanner) {
-                    // This isn't very obvious but close() could be called in a thread
-                    // that is different from the thread that created the scanner.
-                    @Override
-                    public void close() throws IOException {
-                        try {
-                            delegate.close();
-                        } finally {
-                            if (child != null) {
-                                child.stop();
-                            }
-                        }
-                    }
-                };
-                success = true;
-                return scanner;
-            } finally {
-                try {
-                    if (!success && child != null) {
-                        child.stop();
-                    }
-                } finally {
-                    Trace.continueSpan(savedSpan);
-                }
-            }
+            return new RegionScannerHolder(c, scan, s);
         } catch (Throwable t) {
             // If the exception is NotServingRegionException then throw it as
             // StaleRegionBoundaryCacheException to handle it by phoenix client other wise hbase

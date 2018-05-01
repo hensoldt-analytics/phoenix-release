@@ -546,7 +546,7 @@ public class MetaDataClient {
                         // In this case, we update the parent table which may in turn pull
                         // in indexes to add to this table.
                         long resolvedTime = TransactionUtil.getResolvedTime(connection, result);
-                        if (addIndexesFromPhysicalTable(result, resolvedTimestamp)) {
+                        if (addIndexesFromPhysicalTable(result, resolvedTimestamp, true)) {
                             connection.addTable(result.getTable(), resolvedTime);
                         }
                         else {
@@ -666,10 +666,12 @@ public class MetaDataClient {
      * TODO: combine this round trip with the one that updates the cache for the child table.
      * @param result the result from updating the cache for the current table.
      * @param resolvedTimestamp timestamp at which child table was resolved
+     * @param alwaysAddIndexes flag that determines whether we should recalculate
+     *        all indexes that can be used in the view
      * @return true if the PTable contained by result was modified and false otherwise
      * @throws SQLException if the physical table cannot be found
      */
-    private boolean addIndexesFromPhysicalTable(MetaDataMutationResult result, Long resolvedTimestamp) throws SQLException {
+    private boolean addIndexesFromPhysicalTable(MetaDataMutationResult result, Long resolvedTimestamp, boolean alwaysAddIndexes) throws SQLException {
         PTable view = result.getTable();
         // If not a view or if a view directly over an HBase table, there's nothing to do
         if (view.getType() != PTableType.VIEW || view.getViewType() == ViewType.MAPPED) {
@@ -683,7 +685,8 @@ public class MetaDataClient {
         if (physicalTable == null) {
             throw new TableNotFoundException(schemaName, tableName);
         }
-        if (!result.wasUpdated() && !parentResult.wasUpdated()) {
+        // if alwaysAddIndexes is false we only add indexes if the parent table or view was updated from the server
+        if (!alwaysAddIndexes && !result.wasUpdated() && !parentResult.wasUpdated()) {
             return false;
         }
         List<PTable> physicalTableIndexes = physicalTable.getIndexes();
@@ -3312,7 +3315,7 @@ public class MetaDataClient {
     }
 
     private PTable addTableToCache(MetaDataMutationResult result) throws SQLException {
-        addIndexesFromPhysicalTable(result, null);
+        addIndexesFromPhysicalTable(result, null, false);
         PTable table = result.getTable();
         connection.addTable(table, TransactionUtil.getResolvedTime(connection, result));
         return table;

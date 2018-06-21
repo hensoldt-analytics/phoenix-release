@@ -138,7 +138,7 @@ public abstract class BaseResultIterators extends ExplainTable implements Result
     private Scan scan;
     protected Map<ImmutableBytesPtr,ServerCache> caches;
     protected boolean clearServerCacheOnClose;
-    
+
     static final Function<HRegionLocation, KeyRange> TO_KEY_RANGE = new Function<HRegionLocation, KeyRange>() {
         @Override
         public KeyRange apply(HRegionLocation region) {
@@ -627,6 +627,7 @@ public abstract class BaseResultIterators extends ExplainTable implements Result
                 } catch (EOFException e) {}
             }
             byte[] currentKeyBytes = currentKey.copyBytes();
+            boolean intersectWithGuidePosts = guideIndex < gpsSize;
             // Merge bisect with guideposts for all but the last region
             while (regionIndex <= stopIndex) {
                 HRegionLocation regionLocation = regionLocations.get(regionIndex);
@@ -643,7 +644,7 @@ public abstract class BaseResultIterators extends ExplainTable implements Result
                     keyOffset = ScanUtil.getRowKeyOffset(regionInfo.getStartKey(), endRegionKey);
                 }
                 try {
-                    while (guideIndex < gpsSize && (endKey.length == 0 || currentGuidePost.compareTo(endKey) <= 0)) {
+                    while (intersectWithGuidePosts && (guideIndex < gpsSize && (endKey.length == 0 || currentGuidePost.compareTo(endKey) <= 0))) {
                         Scan newScan = scanRanges.intersectScan(scan, currentKeyBytes, currentGuidePostBytes, keyOffset,
                                 false);
                         if (newScan != null) {
@@ -658,7 +659,9 @@ public abstract class BaseResultIterators extends ExplainTable implements Result
                         currentGuidePostBytes = currentGuidePost.copyBytes();
                         guideIndex++;
                     }
-                } catch (EOFException e) {}
+                } catch (EOFException e) {
+                    intersectWithGuidePosts = false;
+                }
                 Scan newScan = scanRanges.intersectScan(scan, currentKeyBytes, endKey, keyOffset, true);
                 if(newScan != null) {
                     ScanUtil.setLocalIndexAttributes(newScan, keyOffset, regionInfo.getStartKey(),
@@ -888,7 +891,7 @@ public abstract class BaseResultIterators extends ExplainTable implements Result
                 maxQueryEndTime, newNestedScans.size(), previousScan, retryCount);
         return concatIterators;
     }
-    
+
     @Override
     public void close() throws SQLException {
        
@@ -935,7 +938,7 @@ public abstract class BaseResultIterators extends ExplainTable implements Result
         } finally {
             if(clearServerCacheOnClose) {
                 SQLCloseables.closeAllQuietly(caches.values());
-                caches.clear();                
+                caches.clear();
             }
             if (cancelledWork) {
                 context.getConnection().getQueryServices().getExecutor().purge();
@@ -966,7 +969,7 @@ public abstract class BaseResultIterators extends ExplainTable implements Result
     	private final Scan scan;
     	private final boolean isFirstScan;
     	private final boolean isLastScan;
-    	
+
     	public ScanLocator(Scan scan, int outerListIndex, int innerListIndex, boolean isFirstScan, boolean isLastScan) {
     		this.outerListIndex = outerListIndex;
     		this.innerListIndex = innerListIndex;

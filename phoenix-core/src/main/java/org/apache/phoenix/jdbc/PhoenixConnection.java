@@ -860,7 +860,7 @@ public class PhoenixConnection implements Connection, MetaDataMutated, SQLClosea
 
     @Override
     public boolean isReadOnly() throws SQLException {
-        return readOnly || (scn != null && !buildingIndex && !isRunningUpgrade);
+        return readOnly;
     }
 
     @Override

@@ -51,6 +51,7 @@ public class ChunkedResultIterator implements PeekingResultIterator {
 
     private final ParallelIteratorFactory delegateIteratorFactory;
     private ImmutableBytesWritable lastKey = new ImmutableBytesWritable();
+    private ImmutableBytesWritable prevLastKey = new ImmutableBytesWritable();
     private final StatementContext context;
     private final TableRef tableRef;
     private final long chunkSize;
@@ -84,8 +85,9 @@ public class ChunkedResultIterator implements PeekingResultIterator {
         }
     }
 
-    private ChunkedResultIterator(ParallelIteratorFactory delegateIteratorFactory, MutationState mutationState,
-    		StatementContext context, TableRef tableRef, Scan scan, long chunkSize, ResultIterator scanner, QueryPlan plan) throws SQLException {
+    private ChunkedResultIterator(ParallelIteratorFactory delegateIteratorFactory,
+            MutationState mutationState, StatementContext context, TableRef tableRef, Scan scan,
+            long chunkSize, ResultIterator scanner, QueryPlan plan) throws SQLException {
         this.delegateIteratorFactory = delegateIteratorFactory;
         this.context = context;
         this.tableRef = tableRef;
@@ -126,8 +128,12 @@ public class ChunkedResultIterator implements PeekingResultIterator {
         if (resultIterator.peek() == null && lastKey != null) {
             resultIterator.close();
             scan = ScanUtil.newScan(scan);
-            if(ScanUtil.isLocalIndex(scan)) {
+            if (ScanUtil.isLocalIndex(scan)) {
                 scan.setAttribute(SCAN_START_ROW_SUFFIX, ByteUtil.copyKeyBytesIfNecessary(lastKey));
+            } else if (ScanUtil.isReversed(scan)) {
+                // lastKey is the last row the previous iterator meet but not returned.
+                // for reverse scan, use prevLastKey as the new stopRow.
+                scan.setStopRow(ByteUtil.copyKeyBytesIfNecessary(prevLastKey));
             } else {
                 scan.setStartRow(ByteUtil.copyKeyBytesIfNecessary(lastKey));
             }
@@ -198,6 +204,7 @@ public class ChunkedResultIterator implements PeekingResultIterator {
             byte[] currentKey = lastKey.get();
             int offset = lastKey.getOffset();
             int length = lastKey.getLength();
+            prevLastKey.set(lastKey.copyBytes());
             newTuple.getKey(lastKey);
 
             return Bytes.compareTo(currentKey, offset, length, lastKey.get(), lastKey.getOffset(), lastKey.getLength()) != 0;

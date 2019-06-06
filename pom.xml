@@ -108,7 +108,7 @@
     <jodatime.version>1.6</jodatime.version>
     <joni.version>2.1.2</joni.version>
     <avatica.version>1.10.0.3.0.3.0-SNAPSHOT</avatica.version>
-    <jetty.version>9.3.25.v20180904</jetty.version>
+    <jetty.version>9.3.27.v20190418</jetty.version>
     <tephra.version>0.14.0-incubating</tephra.version>
     <spark.version>2.3.0</spark.version>
     <scala.version>2.11.8</scala.version>

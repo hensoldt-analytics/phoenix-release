@@ -50,6 +50,7 @@ import org.apache.phoenix.mapreduce.util.PhoenixConfigurationUtil;
 import org.apache.phoenix.query.HBaseFactoryProvider;
 import org.apache.phoenix.query.KeyRange;
 import org.apache.phoenix.query.QueryServices;
+import org.apache.phoenix.query.QueryServicesOptions;
 import org.apache.phoenix.util.PhoenixRuntime;
 
 import com.google.common.base.Preconditions;
@@ -174,7 +175,8 @@ public class PhoenixInputFormat<T extends DBWritable> extends InputFormat<NullWr
             if(txnScnValue==null && currentScnValue!=null) {
                 overridingProps.put(PhoenixRuntime.CURRENT_SCN_ATTRIB, currentScnValue);
             }
-            overridingProps.put(QueryServices.TRANSACTIONS_ENABLED, "true");
+            // Don't enable transactions unless the caller tells us to.
+            // overridingProps.put(QueryServices.TRANSACTIONS_ENABLED, "true");
             final Connection connection = ConnectionUtil.getInputConnection(configuration, overridingProps);
             final String selectStatement = PhoenixConfigurationUtil.getSelectStatement(configuration);
             Preconditions.checkNotNull(selectStatement);

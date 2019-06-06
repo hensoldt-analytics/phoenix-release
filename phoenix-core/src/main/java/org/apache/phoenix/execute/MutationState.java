@@ -558,7 +558,7 @@ public class MutationState implements SQLCloseable {
         final Iterator<PTable> indexes = // Only maintain tables with immutable rows through this client-side mechanism
                 (table.isImmutableRows() || includeMutableIndexes) ? 
                         IndexMaintainer.nonDisabledIndexIterator(table.getIndexes().iterator()) : 
-                        Iterators.<PTable>emptyIterator();
+                        Collections.<PTable>emptyIterator();
         final List<Mutation> mutationList = Lists.newArrayListWithExpectedSize(values.size());
         final List<Mutation> mutationsPertainingToIndex = indexes.hasNext() ? Lists.<Mutation>newArrayListWithExpectedSize(values.size()) : null;
         generateMutations(tableRef, timestamp, values, mutationList, mutationsPertainingToIndex);
@@ -673,7 +673,7 @@ public class MutationState implements SQLCloseable {
     public Iterator<Pair<byte[],List<Mutation>>> toMutations(final boolean includeMutableIndexes, final Long tableTimestamp) {
         final Iterator<Map.Entry<TableRef, Map<ImmutableBytesPtr,RowMutationState>>> iterator = this.mutations.entrySet().iterator();
         if (!iterator.hasNext()) {
-            return Iterators.emptyIterator();
+            return Collections.emptyIterator();
         }
         Long scn = connection.getSCN();
         final long timestamp = (tableTimestamp!=null && tableTimestamp!=QueryConstants.UNSET_TIMESTAMP) ? tableTimestamp : (scn == null ? HConstants.LATEST_TIMESTAMP : scn);
@@ -1306,6 +1306,9 @@ public class MutationState implements SQLCloseable {
             @Override
             public boolean apply(TableRef tableRef) {
                 return tableRef.getTable().isTransactional();
+            }
+            @Override public boolean test(TableRef tableRef) {
+                return apply(tableRef);
             }
         });
         if (filteredTableRefs.hasNext()) {

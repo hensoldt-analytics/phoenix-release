@@ -93,7 +93,7 @@ public class IndexToolIT extends BaseOwnClusterHBaseManagedTimeIT {
         Map<String, String> serverProps = Maps.newHashMapWithExpectedSize(1);
         serverProps.put(QueryServices.EXTRA_JDBC_ARGUMENTS_ATTRIB, QueryServicesOptions.DEFAULT_EXTRA_JDBC_ARGUMENTS);
         Map<String, String> clientProps = Maps.newHashMapWithExpectedSize(1);
-        clientProps.put(QueryServices.TRANSACTIONS_ENABLED, "true");
+        //clientProps.put(QueryServices.TRANSACTIONS_ENABLED, "true");
         setUpRealDriver(new ReadOnlyProps(serverProps.entrySet().iterator()), new ReadOnlyProps(clientProps.entrySet().iterator()));
     }
     
@@ -101,9 +101,9 @@ public class IndexToolIT extends BaseOwnClusterHBaseManagedTimeIT {
     public static Collection<Boolean[]> data() {
         return Arrays.asList(new Boolean[][] {     
                  { false, false, false, false }, { false, false, false, true }, { false, false, true, false }, { false, false, true, true }, 
-                 { false, true, false, false }, { false, true, false, true }, { false, true, true, false }, { false, true, true, true }, 
-                 { true, false, false, false }, { true, false, false, true }, { true, false, true, false }, { true, false, true, true }, 
-                 { true, true, false, false }, { true, true, false, true }, { true, true, true, false }, { true, true, true, true }
+                 { false, true, false, false }, { false, true, false, true }, { false, true, true, false }, { false, true, true, true } 
+//                 { true, false, false, false }, { true, false, false, true }, { true, false, true, false }, { true, false, true, true }, 
+//                 { true, true, false, false }, { true, true, false, true }, { true, true, true, false }, { true, true, true, true }
            });
     }
     
@@ -112,7 +112,7 @@ public class IndexToolIT extends BaseOwnClusterHBaseManagedTimeIT {
         final String fullTableName = SchemaUtil.getTableName(schemaName, dataTable);
         final String indxTable = String.format("%s_%s", dataTable, "INDX");
         Properties props = PropertiesUtil.deepCopy(TEST_PROPERTIES);
-        props.setProperty(QueryServices.TRANSACTIONS_ENABLED, Boolean.TRUE.toString());
+        //props.setProperty(QueryServices.TRANSACTIONS_ENABLED, Boolean.TRUE.toString());
         props.setProperty(QueryServices.EXPLAIN_ROW_COUNT_ATTRIB, Boolean.FALSE.toString());
         Connection conn = DriverManager.getConnection(getUrl(), props);
         logger.debug(String.format("%%%%conn is %s", conn == null ? "null" : conn.getClass().getCanonicalName()));
@@ -166,7 +166,7 @@ public class IndexToolIT extends BaseOwnClusterHBaseManagedTimeIT {
             //run the index MR job.
             final IndexTool indexingTool = new IndexTool();
             Configuration configuration = new Configuration(getUtility().getConfiguration());
-            configuration.set(QueryServices.TRANSACTIONS_ENABLED, "true");
+            //configuration.set(QueryServices.TRANSACTIONS_ENABLED, "true");
             indexingTool.setConf(configuration);
             
             final String[] cmdArgs = getArgValues(schemaName, dataTable, indxTable, directApi);
@@ -232,7 +232,7 @@ public class IndexToolIT extends BaseOwnClusterHBaseManagedTimeIT {
         String dataTableFullName = SchemaUtil.getTableName(schemaName, dataTableName);
         String indexTableName = "IDX";
         Properties props = PropertiesUtil.deepCopy(TEST_PROPERTIES);
-        props.setProperty(QueryServices.TRANSACTIONS_ENABLED, Boolean.TRUE.toString());
+        // props.setProperty(QueryServices.TRANSACTIONS_ENABLED, Boolean.TRUE.toString());
         try (Connection conn = DriverManager.getConnection(getUrl(), props)) {
             String dataDDL =
                     "CREATE TABLE " + dataTableFullName + "(\n"
@@ -303,7 +303,7 @@ public class IndexToolIT extends BaseOwnClusterHBaseManagedTimeIT {
             String dataTableName, String indexTableName) throws Exception {
         IndexTool indexingTool = new IndexTool();
         Configuration conf = new Configuration(getUtility().getConfiguration());
-        conf.set(QueryServices.TRANSACTIONS_ENABLED, Boolean.TRUE.toString());
+        // conf.set(QueryServices.TRANSACTIONS_ENABLED, Boolean.TRUE.toString());
         indexingTool.setConf(conf);
         final String[] cmdArgs =
                 getArgValues(schemaName, dataTableName, indexTableName, directApi);

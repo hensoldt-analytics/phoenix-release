@@ -81,7 +81,7 @@ public class IndexBuildManager implements Stoppable {
   public IndexBuildManager(RegionCoprocessorEnvironment env) throws IOException {
     // Prevent deadlock by using single thread for all reads so that we know
     // we can get the ReentrantRWLock. See PHOENIX-2671 for more details.
-    this(getIndexBuilder(env), new QuickFailingTaskRunner(MoreExecutors.sameThreadExecutor()));
+    this(getIndexBuilder(env), new QuickFailingTaskRunner(MoreExecutors.newDirectExecutorService()));
   }
   
   private static IndexBuilder getIndexBuilder(RegionCoprocessorEnvironment e) throws IOException {

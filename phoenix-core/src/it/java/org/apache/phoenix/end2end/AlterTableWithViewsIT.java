@@ -57,18 +57,20 @@ import org.apache.phoenix.util.PhoenixRuntime;
 import org.apache.phoenix.util.ReadOnlyProps;
 import org.apache.phoenix.util.SchemaUtil;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 
+@Ignore
 public class AlterTableWithViewsIT extends BaseHBaseManagedTimeIT {
 	
 	@BeforeClass
     @Shadower(classBeingShadowed = BaseHBaseManagedTimeIT.class)
     public static void doSetup() throws Exception {
         Map<String,String> props = Maps.newHashMapWithExpectedSize(1);
-        props.put(QueryServices.TRANSACTIONS_ENABLED, Boolean.toString(true));
+        //props.put(QueryServices.TRANSACTIONS_ENABLED, Boolean.toString(true));
         setUpTestDriver(new ReadOnlyProps(props.entrySet().iterator()));
     }
     
@@ -1111,6 +1113,7 @@ public class AlterTableWithViewsIT extends BaseHBaseManagedTimeIT {
     }
     
     @Test
+    @Ignore
     public void testMakeBaseTableTransactional() throws Exception {
         try (Connection conn = DriverManager.getConnection(getUrl())) {       
             conn.createStatement().execute("CREATE TABLE IF NOT EXISTS TABLEWITHVIEW ("

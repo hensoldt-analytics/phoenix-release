@@ -101,7 +101,7 @@ public class ImmutableIndexIT extends BaseHBaseManagedTimeIT {
         Map<String, String> serverProps = Maps.newHashMapWithExpectedSize(1);
         serverProps.put("hbase.coprocessor.region.classes", CreateIndexRegionObserver.class.getName());
         Map<String, String> clientProps = Maps.newHashMapWithExpectedSize(2);
-        clientProps.put(QueryServices.TRANSACTIONS_ENABLED, "true");
+        //clientProps.put(QueryServices.TRANSACTIONS_ENABLED, "true");
         clientProps.put(QueryServices.INDEX_POPULATION_SLEEP_TIME, "15000");
         setUpTestDriver(new ReadOnlyProps(serverProps.entrySet().iterator()), new ReadOnlyProps(clientProps.entrySet().iterator()));
     }
@@ -109,8 +109,8 @@ public class ImmutableIndexIT extends BaseHBaseManagedTimeIT {
     @Parameters(name="localIndex = {0} , transactional = {1}")
     public static Collection<Boolean[]> data() {
 		return Arrays.asList(new Boolean[][] { 
-				{ false, false }, { false, true },
-				{ true, false }, { true, true } });
+				{ false, false }, /*{ false, true }*/
+				{ true, false }/*, { true, true }*/ });
     }
 
     @Test

@@ -90,14 +90,15 @@ public class PartialCommitIT extends BaseOwnClusterIT {
         serverProps.put("hbase.coprocessor.region.classes", FailingRegionObserver.class.getName());
         serverProps.put("hbase.coprocessor.abortonerror", "false");
         serverProps.put(Indexer.CHECK_VERSION_CONF_KEY, "false");
-        Map<String, String> clientProps = Collections.singletonMap(QueryServices.TRANSACTIONS_ENABLED, "true");
+        Map<String, String> clientProps = Collections.emptyMap();
+        // Map<String, String> clientProps = Collections.singletonMap(QueryServices.TRANSACTIONS_ENABLED, "true");
         setUpTestDriver(new ReadOnlyProps(serverProps.entrySet().iterator()), new ReadOnlyProps(clientProps.entrySet().iterator()));
         createTablesWithABitOfData();
     }
     
     @Parameters(name="transactional = {0}")
     public static Collection<Boolean> data() {
-        return Arrays.asList(false, true);
+        return Arrays.asList(false/*, true*/);
     }
     
     private final boolean transactional;
@@ -125,17 +126,17 @@ public class PartialCommitIT extends BaseOwnClusterIT {
             sta.execute("create table a_success_table (k varchar primary key, c varchar)");
             sta.execute("create table b_failure_table (k varchar primary key, c varchar)");
             sta.execute("create table c_success_table (k varchar primary key, c varchar)");
-            sta.execute("create table a_success_table_txn (k varchar primary key, c varchar) TRANSACTIONAL=true");
-            sta.execute("create table b_failure_table_txn (k varchar primary key, c varchar) TRANSACTIONAL=true");
-            sta.execute("create table c_success_table_txn (k varchar primary key, c varchar) TRANSACTIONAL=true");
+            // sta.execute("create table a_success_table_txn (k varchar primary key, c varchar) TRANSACTIONAL=true");
+            // sta.execute("create table b_failure_table_txn (k varchar primary key, c varchar) TRANSACTIONAL=true");
+            // sta.execute("create table c_success_table_txn (k varchar primary key, c varchar) TRANSACTIONAL=true");
             con.commit();
         }
 
         try (Connection con = driver.connect(url, new Properties())) {
             con.setAutoCommit(false);
             Statement sta = con.createStatement();
-            for (String table : newHashSet("a_success_table", "b_failure_table", "c_success_table", 
-            		"a_success_table_txn", "b_failure_table_txn", "c_success_table_txn")) {
+            for (String table : newHashSet("a_success_table", "b_failure_table", "c_success_table" 
+            		/*"a_success_table_txn", "b_failure_table_txn", "c_success_table_txn"*/)) {
                 sta.execute("upsert into " + table + " values ('z', 'z')");
                 sta.execute("upsert into " + table + " values ('zz', 'zz')");
                 sta.execute("upsert into " + table + " values ('zzz', 'zzz')");

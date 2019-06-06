@@ -119,7 +119,7 @@
     <commons-logging.version>1.2</commons-logging.version>
     <commons-csv.version>1.0</commons-csv.version>
     <sqlline.version>1.1.8</sqlline.version>
-    <guava.version>13.0.1</guava.version>
+    <guava.version>24.1.1-jre</guava.version>
     <flume.version>1.5.2.2.6.5.0-SNAPSHOT</flume.version>
     <findbugs-annotations.version>1.3.9-1</findbugs-annotations.version>
     <jcip-annotations.version>1.0-1</jcip-annotations.version>

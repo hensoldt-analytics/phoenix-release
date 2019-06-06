@@ -108,11 +108,11 @@ public class PhoenixDriverTest extends BaseConnectionlessQueryTest {
         } catch(SQLException e) {
             assertEquals(SQLExceptionCode.TX_MUST_BE_ENABLED_TO_SET_ISOLATION_LEVEL.getErrorCode(), e.getErrorCode());
         }
-        Properties props = PropertiesUtil.deepCopy(TestUtil.TEST_PROPERTIES);
-        props.setProperty(QueryServices.TRANSACTIONS_ENABLED, Boolean.toString(true));
-        conn = DriverManager.getConnection(getUrl(), props);
-        conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
-        conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+        // Properties props = PropertiesUtil.deepCopy(TestUtil.TEST_PROPERTIES);
+        // props.setProperty(QueryServices.TRANSACTIONS_ENABLED, Boolean.toString(true));
+        // conn = DriverManager.getConnection(getUrl(), props);
+        // conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+        // conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
     }
 
     @Test

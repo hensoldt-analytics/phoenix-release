@@ -452,7 +452,7 @@ public class WhereOptimizer {
         private static final KeySlots EMPTY_KEY_SLOTS = new KeySlots() {
             @Override
             public Iterator<KeySlot> iterator() {
-                return Iterators.emptyIterator();
+                return Collections.emptyIterator();
             }
 
             @Override
@@ -883,7 +883,7 @@ public class WhereOptimizer {
         public Iterator<Expression> visitEnter(ComparisonExpression node) {
             Expression rhs = node.getChildren().get(1);
             if (!rhs.isStateless() || node.getFilterOp() == CompareOp.NOT_EQUAL) {
-                return Iterators.emptyIterator();
+                return Collections.emptyIterator();
             }
             return Iterators.singletonIterator(node.getChildren().get(0));
         }
@@ -913,7 +913,7 @@ public class WhereOptimizer {
         public Iterator<Expression> visitEnter(ScalarFunction node) {
             int index = node.getKeyFormationTraversalIndex();
             if (index < 0) {
-                return Iterators.emptyIterator();
+                return Collections.emptyIterator();
             }
             return Iterators.singletonIterator(node.getChildren().get(index));
         }
@@ -931,7 +931,7 @@ public class WhereOptimizer {
             // TODO: can we optimize something that starts with '_' like this: foo LIKE '_a%' ?
             if (node.getLikeType() == LikeType.CASE_INSENSITIVE || // TODO: remove this when we optimize ILIKE
                 ! (node.getChildren().get(1) instanceof LiteralExpression) || node.startsWithWildcard()) {
-                return Iterators.emptyIterator();
+                return Collections.emptyIterator();
             }
 
             return Iterators.singletonIterator(node.getChildren().get(0));

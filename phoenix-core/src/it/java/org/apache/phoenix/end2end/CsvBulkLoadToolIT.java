@@ -56,7 +56,7 @@ public class CsvBulkLoadToolIT extends BaseOwnClusterHBaseManagedTimeIT {
         Map<String, String> serverProps = Maps.newHashMapWithExpectedSize(1);
         serverProps.put(QueryServices.EXTRA_JDBC_ARGUMENTS_ATTRIB, QueryServicesOptions.DEFAULT_EXTRA_JDBC_ARGUMENTS);
         Map<String, String> clientProps = Maps.newHashMapWithExpectedSize(1);
-        clientProps.put(QueryServices.TRANSACTIONS_ENABLED, "true");
+        //clientProps.put(QueryServices.TRANSACTIONS_ENABLED, "true");
         setUpRealDriver(new ReadOnlyProps(serverProps.entrySet().iterator()), new ReadOnlyProps(clientProps.entrySet().iterator()));
         zkQuorum = "localhost:" + getUtility().getZkCluster().getClientPort();
         conn = DriverManager.getConnection(getUrl());

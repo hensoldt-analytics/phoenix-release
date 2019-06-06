@@ -17,7 +17,6 @@
  */
 package org.apache.phoenix.compile;
 
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import org.apache.phoenix.coprocessor.BaseScannerRegionObserver;
 import org.apache.phoenix.expression.Expression;
@@ -84,7 +83,7 @@ public class AggregationManager {
                 @Override
                 public Iterator<Expression> visitEnter(SingleAggregateFunction function) {
                     aggFuncSet.add(function);
-                    return Iterators.emptyIterator();
+                    return Collections.emptyIterator();
                 }
             });
         }

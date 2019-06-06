@@ -129,6 +129,9 @@ public class IndexMaintainer implements Writable, Iterable<ColumnReference> {
             public boolean apply(PTable index) {
                 return !PIndexState.DISABLE.equals(index.getIndexState());
             }
+            @Override public boolean test(PTable index) {
+                return apply(index);
+            }
         });
     }
     
@@ -138,6 +141,9 @@ public class IndexMaintainer implements Writable, Iterable<ColumnReference> {
             public boolean apply(PTable index) {
                 return !PIndexState.DISABLE.equals(index.getIndexState()) && !index.getIndexType().equals(IndexType.LOCAL);
             }
+            @Override public boolean test(PTable index) {
+                return apply(index);
+            }
         });
     }
     
@@ -146,6 +152,9 @@ public class IndexMaintainer implements Writable, Iterable<ColumnReference> {
             @Override
             public boolean apply(PTable index) {
                 return !PIndexState.DISABLE.equals(index.getIndexState()) && index.getIndexType().equals(IndexType.LOCAL);
+            }
+            @Override public boolean test(PTable index) {
+                return apply(index);
             }
         });
     }

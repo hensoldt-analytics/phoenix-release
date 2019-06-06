@@ -92,7 +92,7 @@ public class MutableIndexIT extends BaseHBaseManagedTimeIT {
     @Shadower(classBeingShadowed = BaseHBaseManagedTimeIT.class)
     public static void doSetup() throws Exception {
         Map<String,String> props = Maps.newHashMapWithExpectedSize(1);
-        props.put(QueryServices.TRANSACTIONS_ENABLED, Boolean.toString(true));
+        //props.put(QueryServices.TRANSACTIONS_ENABLED, Boolean.toString(true));
         // Forces server cache to be used
         props.put(QueryServices.INDEX_MUTATE_BATCH_SIZE_THRESHOLD_ATTRIB, Integer.toString(1));
         setUpTestDriver(new ReadOnlyProps(props.entrySet().iterator()));
@@ -101,7 +101,7 @@ public class MutableIndexIT extends BaseHBaseManagedTimeIT {
 	@Parameters(name="localIndex = {0} , transactional = {1}")
     public static Collection<Boolean[]> data() {
         return Arrays.asList(new Boolean[][] {
-                { false, false }, { false, true }, { true, false }, { true, true }
+                { false, false }, /*{ false, true },*/ { true, false }, /*{ true, true }*/
            });
     }
     

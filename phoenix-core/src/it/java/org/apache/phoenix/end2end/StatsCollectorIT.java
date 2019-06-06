@@ -73,7 +73,7 @@ public class StatsCollectorIT extends StatsCollectorAbstractIT {
         props.put(QueryServices.EXPLAIN_CHUNK_COUNT_ATTRIB, Boolean.TRUE.toString());
         props.put(QueryServices.EXPLAIN_ROW_COUNT_ATTRIB, Boolean.TRUE.toString());
         props.put(QueryServices.QUEUE_SIZE_ATTRIB, Integer.toString(1024));
-        props.put(QueryServices.TRANSACTIONS_ENABLED, Boolean.toString(true));
+        // props.put(QueryServices.TRANSACTIONS_ENABLED, Boolean.toString(true));
         setUpTestDriver(new ReadOnlyProps(props.entrySet().iterator()));
     }
     
@@ -85,7 +85,7 @@ public class StatsCollectorIT extends StatsCollectorAbstractIT {
     
     @Parameters(name="transactional = {0}")
     public static Collection<Boolean> data() {
-        return Arrays.asList(false,true);
+        return Arrays.asList(false);
     }
 
     @Test

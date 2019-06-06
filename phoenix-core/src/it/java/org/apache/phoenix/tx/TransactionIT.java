@@ -74,6 +74,7 @@ import co.cask.tephra.hbase11.TransactionAwareHTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+@Ignore
 public class TransactionIT extends BaseHBaseManagedTimeIT {
     
     private static final String FULL_TABLE_NAME = INDEX_DATA_SCHEMA + QueryConstants.NAME_SEPARATOR + TRANSACTIONAL_DATA_TABLE;

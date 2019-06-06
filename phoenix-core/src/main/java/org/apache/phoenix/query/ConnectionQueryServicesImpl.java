@@ -361,7 +361,8 @@ public class ConnectionQueryServicesImpl extends DelegateQueryServices implement
                          ZKClients.retryOnFailure(tephraZKClientService, RetryStrategies.exponentialDelay(500, 2000, TimeUnit.MILLISECONDS))
                   )
                 );
-        zkClientService.startAndWait();
+        zkClientService.startAsync();
+        zkClientService.awaitRunning();
         ZKDiscoveryService zkDiscoveryService = new ZKDiscoveryService(zkClientService);
         PooledClientProvider pooledClientProvider = new PooledClientProvider(
                 config, zkDiscoveryService);

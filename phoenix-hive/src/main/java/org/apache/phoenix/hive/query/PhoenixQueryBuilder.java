@@ -691,6 +691,9 @@ public class PhoenixQueryBuilder {
             public boolean apply(@Nullable Expression expr) {
                 return expr.isFor(condition);
             }
+            @Override public boolean test(Expression expr) {
+                return apply(expr);
+            }
         }).orNull();
     }
 
@@ -822,6 +825,9 @@ public class PhoenixQueryBuilder {
                     @Override
                     public boolean apply(@Nullable String type) {
                         return typeName.startsWith(type);
+                    }
+                    @Override public boolean test(String type) {
+                        return apply(type);
                     }
                 }) ? prefix + value + postfix : value;
             }

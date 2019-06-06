@@ -209,7 +209,6 @@ import org.apache.phoenix.util.UpgradeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Iterators;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -1644,7 +1643,7 @@ public class MetaDataClient {
             PrimaryKeyConstraint pkConstraint = statement.getPrimaryKeyConstraint();
             String pkName = null;
             List<Pair<ColumnName,SortOrder>> pkColumnsNames = Collections.<Pair<ColumnName,SortOrder>>emptyList();
-            Iterator<Pair<ColumnName,SortOrder>> pkColumnsIterator = Iterators.emptyIterator();
+            Iterator<Pair<ColumnName,SortOrder>> pkColumnsIterator = Collections.emptyIterator();
             if (pkConstraint != null) {
                 pkColumnsNames = pkConstraint.getColumnNames();
                 pkColumnsIterator = pkColumnsNames.iterator();

@@ -119,7 +119,7 @@ public class DistinctAggregatingResultIterator implements AggregatingResultItera
             aggregate(tuple);
             return tuple;
         }
-        resultIterator = Iterators.emptyIterator();
+        resultIterator = Collections.emptyIterator();
         return null;
     }
     
@@ -144,7 +144,7 @@ public class DistinctAggregatingResultIterator implements AggregatingResultItera
 
     @Override
     public void close()  {
-        resultIterator = Iterators.emptyIterator();
+        resultIterator = Collections.emptyIterator();
     }
 
 

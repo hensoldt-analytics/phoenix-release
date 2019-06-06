@@ -70,7 +70,7 @@ public abstract class BaseViewIT extends BaseOwnClusterHBaseManagedTimeIT {
         Map<String,String> props = Maps.newHashMapWithExpectedSize(3);
         props.put(QueryServices.STATS_GUIDEPOST_WIDTH_BYTES_ATTRIB, Integer.toString(20));
         props.put(QueryServices.QUEUE_SIZE_ATTRIB, Integer.toString(1024));
-        props.put(QueryServices.TRANSACTIONS_ENABLED, Boolean.toString(true));
+        //props.put(QueryServices.TRANSACTIONS_ENABLED, Boolean.toString(true));
         setUpTestDriver(new ReadOnlyProps(props.entrySet().iterator()));
     }
     
@@ -88,7 +88,7 @@ public abstract class BaseViewIT extends BaseOwnClusterHBaseManagedTimeIT {
     
     @Parameters(name="transactional = {0}")
     public static Collection<Boolean> data() {
-        return Arrays.asList(new Boolean[] { false, true });
+        return Arrays.asList(new Boolean[] { false });
     }
     
     protected void testUpdatableViewWithIndex(Integer saltBuckets, boolean localIndex) throws Exception {

@@ -114,7 +114,8 @@ public class MutableIndexFailureIT extends BaseOwnClusterHBaseManagedTimeIT {
         serverProps.put(QueryServices.INDEX_REBUILD_RPC_RETRIES_COUNTER, Long.toString(1));
         serverProps.put(QueryServices.INDEX_FAILURE_HANDLING_REBUILD_OVERLAP_FORWARD_TIME_ATTRIB, Long.toString(1000));
         serverProps.put(QueryServices.INDEX_FAILURE_HANDLING_REBUILD_INTERVAL_ATTRIB,"2000");
-        Map<String, String> clientProps = Collections.singletonMap(QueryServices.TRANSACTIONS_ENABLED, "true");
+        // Map<String, String> clientProps = Collections.singletonMap(QueryServices.TRANSACTIONS_ENABLED, "true");
+        Map<String, String> clientProps = Collections.emptyMap();
         NUM_SLAVES_BASE = 4;
         setUpTestDriver(new ReadOnlyProps(serverProps.entrySet().iterator()), new ReadOnlyProps(clientProps.entrySet().iterator()));
     }
@@ -122,7 +123,7 @@ public class MutableIndexFailureIT extends BaseOwnClusterHBaseManagedTimeIT {
     @Parameters(name = "transactional = {0}, localIndex = {1}, isNamespaceMapped = {2}")
     public static Collection<Boolean[]> data() {
         return Arrays.asList(new Boolean[][] { { false, false, true }, { false, false, false }/*, { false, true, true },
-                { false, true, false }*/, { true, false, true }, /*{ true, true, true }, */{ true, false, false },
+                { false, true, false }, { true, false, true }, { true, true, true }, { true, false, false },*/
                 /*{ true, true, false }*/ });
     }
 

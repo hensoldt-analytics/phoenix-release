@@ -25,10 +25,12 @@ import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.schema.stats.StatsCollectorIT;
 import org.apache.phoenix.util.ReadOnlyProps;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.google.common.collect.Maps;
 
+@Ignore
 public class SysTableNamespaceMappedStatsCollectorIT extends StatsCollectorIT {
 
     public SysTableNamespaceMappedStatsCollectorIT(boolean mutable, boolean transactional,

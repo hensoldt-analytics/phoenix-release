@@ -67,9 +67,9 @@ public class MutableIndexFailureWithNamespaceIT extends MutableIndexFailureIT {
                 // note - can't disableIndexOnWriteFailure without throwIndexWriteFailure, PHOENIX-4130
                 { false, false, true, true, false, null},
                 { false, false, true, true, false, true},
-                { true, false, true, true, false, null},
+//                { true, false, true, true, false, null},
                 { false, true, true, true, false, null},
-                { true, true, true, null, false, null},
+//                { true, true, true, null, false, null},
                 { false, false, true, true, true, null},
                 { false, false, true, false, true, false},
                 } 

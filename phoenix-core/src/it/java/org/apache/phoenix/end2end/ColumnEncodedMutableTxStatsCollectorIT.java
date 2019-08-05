@@ -21,8 +21,10 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.phoenix.schema.stats.StatsCollectorIT;
+import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 
+@Ignore
 public class ColumnEncodedMutableTxStatsCollectorIT extends StatsCollectorIT {
 
     public ColumnEncodedMutableTxStatsCollectorIT(boolean mutable, boolean transactional,

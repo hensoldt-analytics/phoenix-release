@@ -20,6 +20,7 @@ package org.apache.phoenix.end2end;
 import org.apache.phoenix.exception.SQLExceptionCode;
 import org.apache.phoenix.exception.SQLExceptionInfo;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -79,6 +80,7 @@ public class UpsertWithSCNIT extends ParallelStatsDisabledIT {
     }
 
     @Test // See https://issues.apache.org/jira/browse/PHOENIX-4983
+    @Ignore
     public void testUpsertOnSCNSetTxnTable() throws SQLException {
 
         helpTestUpserWithSCNIT(false, true, false, false, false);

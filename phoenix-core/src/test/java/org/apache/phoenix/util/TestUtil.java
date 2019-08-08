@@ -831,10 +831,25 @@ public class TestUtil {
         }
     }
 
+    /**
+     * Transaction support is currently not supported, refer to BUG-121089.
+     * @param conn
+     * @param tableName
+     * @throws SQLException
+     */
+    @Deprecated
     public static void createTransactionalTable(Connection conn, String tableName) throws SQLException {
         createTransactionalTable(conn, tableName, "");
     }
 
+    /**
+     * Transaction support is currently not supported, refer to BUG-121089.
+     * @param conn
+     * @param tableName
+     * @param extraProps
+     * @throws SQLException
+     */
+    @Deprecated
     public static void createTransactionalTable(Connection conn, String tableName, String extraProps) throws SQLException {
         conn.createStatement().execute("create table " + tableName + TestUtil.TEST_TABLE_SCHEMA + "TRANSACTIONAL=true" + (extraProps.length() == 0 ? "" : ("," + extraProps)));
     }

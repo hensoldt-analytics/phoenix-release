@@ -46,6 +46,7 @@ import org.apache.phoenix.transaction.PhoenixTransactionContext;
 import org.apache.phoenix.transaction.TransactionFactory;
 import org.apache.phoenix.util.PropertiesUtil;
 import org.apache.phoenix.util.TestUtil;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -54,6 +55,7 @@ import org.junit.Test;
  * TODO: review with Tephra community
  *
  */
+@Ignore
 public class FlappingTransactionIT extends ParallelStatsDisabledIT {
     @Test
     public void testDelete() throws Exception {

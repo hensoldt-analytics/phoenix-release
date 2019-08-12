@@ -18,3 +18,21 @@ Changes over HDP-3.0.1
   BUG-109362 PHOENIX-4822 Fixed Spelling.
   BUG-109362 PHOENIX-4822 Ensure the provided timezone is used client-side (Jaanai Zhang)
   PHOENIX-4880 Shade the rest of Phoenix dependencies in phoenix-server.jar
+
+Changes over HDP-3.0.3
+  PHOENIX-5388 Incorrect current_date()/now() when query involves subquery
+  PHOENIX-5060 DeleteFamily cells are getting skipped while building Index data after HBASE-21158
+  PHOENIX-4822 Ensure the provided timezone is used client-side
+  PHOENIX-5070 NPE when upgrading Phoenix 4.13.0 to Phoenix 4.14.1 with hbase-1.x branch in secure setup
+  PHOENIX-5178 SYSTEM schema is not getting cached at MetaData server
+  PHOENIX-4872 BulkLoad has bug when loading on single-cell-array-with-offsets table.
+  PHOENIX-3067 Phoenix metrics system should not be started in mini-cluster mode
+  PHOENIX-3499 Enable null value for quote character for CSVBulkLoad tool
+  PHOENIX-3633 null pointer exception when subsquery for not exists returns empty result set
+  PHOENIX-3662 PhoenixStorageHandler throws ClassCastException
+  PHOENIX-3710 Cannot use lowername data table name with indextool
+  PHOENIX-4983: Allow using a connection with a SCN set to write data to tables EXCEPT transactional tables or mutable tables with indexes or tables with ROW_TIMESTAMP column.
+  PHOENIX-5309 Skip adding log4j and slf4j to phoenix-hive jar to avoid logging in hive-server2.err
+  BUG-121089 updating guava to 28.0-jre.
+  BUG-121088 Upgrade to jackson-databind 2.9.9.1 in Phoenix
+  BUG-121167 Exclude tomcat jasper dependencies from Phoenix

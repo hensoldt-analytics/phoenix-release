@@ -115,6 +115,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nonnull;
 
@@ -834,6 +835,17 @@ public abstract class BaseTest {
 
     protected static String generateRandomString() {
       return RandomStringUtils.randomAlphabetic(20).toUpperCase();
+    }
+
+    private static AtomicInteger NAME_SUFFIX = new AtomicInteger(0);
+    private static final int MAX_SUFFIX_VALUE = 1000000;
+
+    public static String generateUniqueName() {
+        int nextName = NAME_SUFFIX.incrementAndGet();
+        if (nextName >= MAX_SUFFIX_VALUE) {
+            throw new IllegalStateException("Used up all unique names");
+        }
+        return "T" + Integer.toString(MAX_SUFFIX_VALUE + nextName).substring(1);
     }
 
     protected static void createTestTable(String url, String ddl) throws SQLException {

@@ -83,6 +83,7 @@
     <commons-cli.version>1.4</commons-cli.version>
     <hive.version>3.1.0.3.0.3.0-SNAPSHOT</hive.version>
     <pig.version>0.13.0</pig.version>
+    <tez.version>0.9.1</tez.version>
     <jackson.version>1.9.2</jackson.version>
     <antlr.version>3.5.2</antlr.version>
     <log4j.version>1.2.17</log4j.version>

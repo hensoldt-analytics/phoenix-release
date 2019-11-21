@@ -44,3 +44,5 @@ Changes in HDP-3.1.5 over HDP-3.1.4
   BUG-121970 MetaTableAccessor changes in HBASE-22777 break phoenix
   BUG-122051 PHOENIX-5506 Psql load fails with lower table name
   BUG-122137 Upgrade jackson-databind to 2.10.0 in Phoenix
+  BUG-122458 PHOENIX-5552 Hive against Phoenix gets "Expecting "RPAREN", got "L" in Tez mode"
+  BUG-122458 PHOENIX-5552 Hive against Phoenix gets "Expecting "RPAREN", got "L" in Tez mode" (addendum)

@@ -41,6 +41,7 @@ import org.apache.phoenix.compile.QueryPlan;
 import org.apache.phoenix.exception.SQLExceptionCode;
 import org.apache.phoenix.jdbc.PhoenixConnection;
 import org.apache.phoenix.query.KeyRange;
+import org.apache.phoenix.query.QueryConstants;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.schema.ColumnAlreadyExistsException;
 import org.apache.phoenix.schema.ReadOnlyTableException;
@@ -639,6 +640,25 @@ public class ViewIT extends BaseViewIT {
         } catch (SQLException e) {
             assertEquals(NOT_NULLABLE_COLUMN_IN_ROW_KEY.getErrorCode(), e.getErrorCode());
         }
+    }
+
+    @Test
+    public void testAlterViewWithNamespaceMapping() throws Exception {
+        Properties props = new Properties();
+        props.put(QueryServices.IS_NAMESPACE_MAPPING_ENABLED, Boolean.toString(true));
+        Connection conn = DriverManager.getConnection(getUrl(),props);
+        final String schemaName = "S";
+        String tableName = schemaName + QueryConstants.NAME_SEPARATOR + fullTableName;
+        String viewName = schemaName + QueryConstants.NAME_SEPARATOR + "V1";
+        String ddl = "CREATE SCHEMA IF NOT EXISTS "+ schemaName;
+        conn.createStatement().execute(ddl);
+        ddl = "CREATE TABLE " + tableName + " (k1 INTEGER NOT NULL, k2 INTEGER NOT NULL, "
+            + "v1 DECIMAL, CONSTRAINT pk PRIMARY KEY (k1, k2))";
+        conn.createStatement().execute(ddl);
+        ddl = "CREATE VIEW " + viewName + " AS SELECT * FROM " + tableName  + " WHERE v1 = 1.0";
+        conn.createStatement().execute(ddl);
+        ddl = "ALTER VIEW " + viewName + " ADD k3 VARCHAR";
+        conn.createStatement().execute(ddl);
     }
     
     @Test

@@ -101,7 +101,7 @@ public class PhoenixInputFormat<T extends DBWritable> implements InputFormat<Wri
         String filterExprSerialized = jobConf.get(TableScanDesc.FILTER_EXPR_CONF_STR);
         if (filterExprSerialized != null) {
             ExprNodeGenericFuncDesc filterExpr =
-                    Utilities.deserializeExpression(filterExprSerialized);
+                    SerializationUtilities.deserializeExpression(filterExprSerialized);
             PhoenixPredicateDecomposer predicateDecomposer =
                     PhoenixPredicateDecomposer
                       .create(Arrays.asList(jobConf.get(serdeConstants.LIST_COLUMNS).split(",")));

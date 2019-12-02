@@ -36,10 +36,10 @@ Changes over HDP-3.0.3
   BUG-121089 updating guava to 28.0-jre.
   BUG-121088 Upgrade to jackson-databind 2.9.9.1 in Phoenix
   BUG-121167 Exclude tomcat jasper dependencies from Phoenix
-
-Changes in HDP-3.1.5 over HDP-3.1.4
   BUG-121421 PHOENIX-5188 IndexedKeyValue should populate KeyValue fields
   BUG-121421 PHOENIX-5289 IndexRebuildTaskIT fails with HBase 1.5.x.
+
+Changes in HDP-3.1.5 over HDP-3.1.4
   BUG-121970 Fix Phoenix build for HBase 2.1
   BUG-121970 MetaTableAccessor changes in HBASE-22777 break phoenix
   BUG-122051 PHOENIX-5506 Psql load fails with lower table name

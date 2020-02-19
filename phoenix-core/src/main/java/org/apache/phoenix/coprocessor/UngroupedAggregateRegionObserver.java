@@ -407,7 +407,10 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
         if(buildLocalIndex) {
             checkForLocalIndexColumnFamilies(region, indexMaintainers);
         }
-        if (isDescRowKeyOrderUpgrade || isDelete || isUpsert || (deleteCQ != null && deleteCF != null) || emptyCF != null || buildLocalIndex) {
+        if (isDescRowKeyOrderUpgrade || isDelete ||
+                (isUpsert && (targetHTable == null ||
+                        targetHTable.getName().equals(region.getTableDesc().getTableName())))
+                || (deleteCQ != null && deleteCF != null) || emptyCF != null || buildLocalIndex) {
             needToWrite = true;
             // TODO: size better
             mutations = Lists.newArrayListWithExpectedSize(1024);

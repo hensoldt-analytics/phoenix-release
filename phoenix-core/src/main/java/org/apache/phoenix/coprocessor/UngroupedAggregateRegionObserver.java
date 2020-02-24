@@ -147,7 +147,7 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
     /**
      * This lock used for synchronizing the state of
      * {@link UngroupedAggregateRegionObserver#scansReferenceCount},
-     * {@link UngroupedAggregateRegionObserver#isRegionClosing} variables used to avoid possible
+     * {@link UngroupedAggregateRegionObserver#isRegionClosingOrSplitting} variables used to avoid possible
      * dead lock situation in case below steps: 
      * 1. We get read lock when we start writing local indexes, deletes etc.. 
      * 2. when memstore reach threshold, flushes happen. Since they use read (shared) lock they 
@@ -173,7 +173,7 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
     @GuardedBy("lock")
     private int scansReferenceCount = 0;
     @GuardedBy("lock")
-    private boolean isRegionClosing = false;
+    private boolean isRegionClosingOrSplitting = false;
     private static final Logger logger = LoggerFactory.getLogger(UngroupedAggregateRegionObserver.class);
     private KeyValueBuilder kvBuilder;
     private Configuration upsertSelectConfig;
@@ -202,7 +202,7 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
         upsertSelectConfig.setClass(RpcControllerFactory.CUSTOM_CONTROLLER_CONF_KEY,
                 InterRegionServerIndexRpcControllerFactory.class, RpcControllerFactory.class);
 
-        isRegionClosing = false;
+        isRegionClosingOrSplitting = false;
         scansReferenceCount = 0;
     }
 
@@ -233,14 +233,14 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
      */
     private void checkForRegionClosing(HRegionInfo regionInfo) throws IOException {
         synchronized (lock) {
-            if(isRegionClosing) {
+            if(isRegionClosingOrSplitting) {
                 lock.notifyAll();
                 throw new IOException("Region " + regionInfo
                         + "is getting closed. Not allowing to write to avoid possible deadlock.");
             }
         }
     }
-    
+
     private void setIndexAndTransactionProperties(List<Mutation> mutations, byte[] indexUUID, byte[] indexMaintainersPtr, byte[] txState) {
         for (Mutation m : mutations) {
            if (indexMaintainersPtr != null) {
@@ -254,7 +254,7 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
            }
         }
     }
-    
+
     private void commitBatchWithHTable(HTable table, List<Mutation> mutations) throws IOException {
         if (mutations.isEmpty()) { return; }
         logger.debug("Committing batch of " + mutations.size() + " mutations for " + table);
@@ -265,6 +265,8 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
             throw new RuntimeException(e);
         }
     }
+
+    // TODO: out of order cherry pick: checkForRegionClosing() should use isRegionClosingOrSplitting
 
     public static void serializeIntoScan(Scan scan) {
         scan.setAttribute(BaseScannerRegionObserver.UNGROUPED_AGG, QueryConstants.TRUE);
@@ -323,7 +325,7 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
             flushSize = conf.getLong(HConstants.HREGION_MEMSTORE_FLUSH_SIZE,
                     HTableDescriptor.DEFAULT_MEMSTORE_FLUSH_SIZE);
         }
-        
+
         /**
          * Upper bound of memstore size allowed for region. Updates will be blocked until the flush
          * happen if the memstore reaches this threshold.
@@ -351,7 +353,7 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
         List<Mutation> indexMutations = localIndexBytes == null ? Collections.<Mutation>emptyList() : Lists.<Mutation>newArrayListWithExpectedSize(1024);
         
         RegionScanner theScanner = s;
-        
+
         byte[] indexUUID = scan.getAttribute(PhoenixIndexCodec.INDEX_UUID);
         byte[] txState = scan.getAttribute(BaseScannerRegionObserver.TX_STATE);
         List<Expression> selectExpressions = null;
@@ -429,10 +431,15 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
         final RegionScanner innerScanner = theScanner;
         byte[] indexMaintainersPtr = scan.getAttribute(PhoenixIndexCodec.INDEX_MD);
         boolean aquiredLock = false;
+        boolean incrScanRefCount = false;
         try {
             if(needToWrite) {
                 synchronized (lock) {
+                    if (isRegionClosingOrSplitting) {
+                        throw new IOException("Temporarily unable to write from scan because region is closing or splitting");
+                    }
                     scansReferenceCount++;
+                    incrScanRefCount = true;
                 }
             }
             region.startRegionOperation();
@@ -679,7 +686,7 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
                 }
             }
         } finally {
-            if(needToWrite) {
+            if(needToWrite && incrScanRefCount) {
                 synchronized (lock) {
                     scansReferenceCount--;
                 }
@@ -802,12 +809,12 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
         }
         return false;
     }
-    
+
     private boolean areMutationsInSameTable(HTable targetHTable, Region region) {
         return (targetHTable == null
                 || Bytes.compareTo(targetHTable.getTableName(), region.getTableDesc().getTableName().getName()) == 0);
     }
-    
+
     @Override
     public InternalScanner preCompact(final ObserverContext<RegionCoprocessorEnvironment> c, final Store store,
             final InternalScanner scanner, final ScanType scanType) throws IOException {
@@ -1141,6 +1148,7 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
         // Don't allow splitting if operations need read and write to same region are going on in the
         // the coprocessors to avoid dead lock scenario. See PHOENIX-3111.
         synchronized (lock) {
+            isRegionClosingOrSplitting = true;
             if (scansReferenceCount != 0) {
                 throw new IOException("Operations like local index building/delete/upsert select"
                         + " might be going on so not allowing to split.");
@@ -1166,7 +1174,7 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
             throws IOException {
         synchronized (lock) {
             while (scansReferenceCount != 0) {
-                isRegionClosing = true;
+                isRegionClosingOrSplitting = true;
                 try {
                     lock.wait(1000);
                 } catch (InterruptedException e) {
@@ -1179,5 +1187,5 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
     protected boolean isRegionObserverFor(Scan scan) {
         return scan.getAttribute(BaseScannerRegionObserver.UNGROUPED_AGG) != null;
     }
-    
+
 }

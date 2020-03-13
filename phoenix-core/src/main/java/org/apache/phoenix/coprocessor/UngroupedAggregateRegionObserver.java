@@ -409,11 +409,13 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
         if(buildLocalIndex) {
             checkForLocalIndexColumnFamilies(region, indexMaintainers);
         }
-        if (isDescRowKeyOrderUpgrade || isDelete ||
-                (isUpsert && (targetHTable == null ||
-                        targetHTable.getName().equals(region.getTableDesc().getTableName())))
+        if (isDescRowKeyOrderUpgrade || isDelete || isUpsert
                 || (deleteCQ != null && deleteCF != null) || emptyCF != null || buildLocalIndex) {
             needToWrite = true;
+            if(isUpsert && (targetHTable == null ||
+                    !targetHTable.getName().equals(region.getTableDesc().getTableName()))) {
+                needToWrite = false;
+            }
             // TODO: size better
             mutations = Lists.newArrayListWithExpectedSize(1024);
             batchSize = env.getConfiguration().getInt(MUTATE_BATCH_SIZE_ATTRIB, QueryServicesOptions.DEFAULT_MUTATE_BATCH_SIZE);
@@ -855,7 +857,7 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
             throw new RuntimeException(e);
         }
     }
-    
+
     private RegionScanner rebuildIndices(final RegionScanner innerScanner, final Region region, final Scan scan,
             Configuration config) throws IOException {
         byte[] indexMetaData = scan.getAttribute(PhoenixIndexCodec.INDEX_MD);
@@ -903,7 +905,7 @@ public class UngroupedAggregateRegionObserver extends BaseScannerRegionObserver 
                         }
                         rowCount++;
                     }
-                    
+
                 } while (hasMore);
                 if (!mutations.isEmpty()) {
                     region.batchMutate(mutations.toArray(new Mutation[mutations.size()]), HConstants.NO_NONCE,

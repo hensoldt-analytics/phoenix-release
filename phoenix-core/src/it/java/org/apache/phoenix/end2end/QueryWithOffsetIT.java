@@ -231,4 +231,34 @@ public class QueryWithOffsetIT extends BaseOwnClusterHBaseManagedTimeIT {
         assertEquals(5, md.getColumnCount());
     }
 
+    @Test
+    public void testQueryWithOffset() throws Exception {
+        String tableName = "testQueryWithOffset";
+        Properties props = PropertiesUtil.deepCopy(TEST_PROPERTIES);
+        try (Connection conn = DriverManager.getConnection(getUrl(), props)) {
+            conn.setAutoCommit(true);
+
+            // Create a table
+            conn.createStatement().execute("DROP TABLE if exists " + tableName);
+            conn.createStatement().execute("CREATE TABLE " + tableName + " (" +
+              "  COL1 INTEGER NOT NULL PRIMARY KEY)");
+
+            // Insert 4000 rows to the table
+            for (int i = 0; i < 4000; i++) {
+                conn.createStatement().execute("UPSERT INTO " + tableName +
+                  " VALUES (" + i + ")");
+            }
+
+            // Query for the table with offset 1
+            ResultSet resultSet = conn.createStatement().executeQuery("SELECT * FROM "
+              + tableName + " LIMIT 5000 OFFSET 1");
+
+            // The query should returns 3999 rows
+            int recordCount = 0;
+            while (resultSet.next()) {
+                recordCount++;
+            }
+            assertEquals(3999, recordCount);
+        }
+    }
 }

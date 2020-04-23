@@ -137,7 +137,7 @@ public class ChunkedResultIterator implements PeekingResultIterator {
             ResultIterator singleChunkResultIterator =
                     new SingleChunkResultIterator(new TableResultIterator(mutationState, scan,
                             context.getReadMetricsQueue().allotMetric(SCAN_BYTES, tableName),
-                            renewLeaseThreshold, plan, DefaultParallelScanGrouper.getInstance()),
+                            renewLeaseThreshold, resultIterator, plan, DefaultParallelScanGrouper.getInstance(), null),
                             chunkSize);
             resultIterator = delegateIteratorFactory.newIterator(context, singleChunkResultIterator, scan, tableName, plan);
         }

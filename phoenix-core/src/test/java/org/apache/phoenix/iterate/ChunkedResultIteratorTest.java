@@ -18,29 +18,21 @@
 
 package org.apache.phoenix.iterate;
 
-import static org.apache.phoenix.util.TestUtil.PHOENIX_JDBC_URL;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.apache.phoenix.end2end.ParallelStatsDisabledIT;
+import org.apache.phoenix.jdbc.PhoenixStatement;
+import org.apache.phoenix.query.QueryServices;
+import org.junit.Test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.util.List;
 import java.util.Properties;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.phoenix.compile.QueryPlan;
-import org.apache.phoenix.end2end.ParallelStatsDisabledIT;
-import org.apache.phoenix.jdbc.PhoenixConnection;
-import org.apache.phoenix.jdbc.PhoenixStatement;
-import org.apache.phoenix.query.QueryServices;
-import org.apache.phoenix.schema.PTable;
-import org.apache.phoenix.schema.PTableKey;
-import org.apache.phoenix.schema.TableRef;
-import org.junit.Assert;
-import org.junit.Test;
 
-@SuppressWarnings("deprecated") public class ChunkedResultIteratorTest
-        extends ParallelStatsDisabledIT {
+import static org.apache.phoenix.util.TestUtil.PHOENIX_JDBC_URL;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+@SuppressWarnings("deprecated") public class ChunkedResultIteratorTest extends ParallelStatsDisabledIT {
 
     @Test
     public void testChunked() throws Exception {
@@ -48,7 +40,7 @@ import org.junit.Test;
         props.setProperty(QueryServices.RENEW_LEASE_ENABLED, "false");
         props.setProperty(QueryServices.SCAN_RESULT_CHUNK_SIZE, "2");
         Connection conn = DriverManager.getConnection(PHOENIX_JDBC_URL, props);
-        String tableName = generateUniqueName();
+        String tableName = "ChunkedResultIteratorTest";
 
         conn.createStatement().execute("CREATE TABLE " + tableName
                 + " (A UNSIGNED_LONG NOT NULL PRIMARY KEY, B VARCHAR(10))");

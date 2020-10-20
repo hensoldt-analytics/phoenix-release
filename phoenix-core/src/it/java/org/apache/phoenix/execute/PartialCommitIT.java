@@ -87,7 +87,7 @@ public class PartialCommitIT extends BaseOwnClusterIT {
     private static final byte[] ROW_TO_FAIL_UPSERT_BYTES = Bytes.toBytes("fail me upsert");
     private static final byte[] ROW_TO_FAIL_DELETE_BYTES = Bytes.toBytes("fail me delete");
     private static final HBaseTestingUtility TEST_UTIL = new HBaseTestingUtility();
-    
+
     @Override
     @After
     public void cleanUpAfterTest() throws Exception {}
@@ -104,7 +104,7 @@ public class PartialCommitIT extends BaseOwnClusterIT {
         setUpTestDriver(new ReadOnlyProps(serverProps.entrySet().iterator()), new ReadOnlyProps(clientProps.entrySet().iterator()));
         createTablesWithABitOfData();
     }
-    
+
     @Parameters(name="PartialCommitIT_transactional={0}") // name is used by failsafe as file name in reports
     public static Collection<Boolean> data() {
         return Arrays.asList(false/*, true*/);
@@ -158,7 +158,7 @@ public class PartialCommitIT extends BaseOwnClusterIT {
     public static void teardownCluster() throws Exception {
       TEST_UTIL.shutdownMiniCluster();
     }
-    
+
     @Before
     public void resetGlobalMetrics() {
         for (GlobalMetric m : PhoenixRuntime.getGlobalPhoenixClientMetrics()) {
@@ -174,9 +174,9 @@ public class PartialCommitIT extends BaseOwnClusterIT {
     
     @Test
     public void testUpsertFailure() {
-        testPartialCommit(newArrayList("upsert into " + A_SUCESS_TABLE + " values ('testUpsertFailure1', 'a')", 
-                                       UPSERT_TO_FAIL, 
-                                       "upsert into " + A_SUCESS_TABLE + " values ('testUpsertFailure2', 'b')"), 
+        testPartialCommit(newArrayList("upsert into " + A_SUCESS_TABLE + " values ('testUpsertFailure1', 'a')",
+                                       UPSERT_TO_FAIL,
+                                       "upsert into " + A_SUCESS_TABLE + " values ('testUpsertFailure2', 'b')"),
                                        transactional ? new int[] {0,1,2} : new int[]{1}, true,
                                        newArrayList("select count(*) from " + A_SUCESS_TABLE + " where k like 'testUpsertFailure_'",
                                                     "select count(*) from " + B_FAILURE_TABLE + " where k = '" + Bytes.toString(ROW_TO_FAIL_UPSERT_BYTES) + "'"),
@@ -190,8 +190,8 @@ public class PartialCommitIT extends BaseOwnClusterIT {
             con.commit();
         }
         
-        testPartialCommit(newArrayList("upsert into " + A_SUCESS_TABLE + " values ('testUpsertSelectFailure', 'a')", 
-                                       UPSERT_SELECT_TO_FAIL), 
+        testPartialCommit(newArrayList("upsert into " + A_SUCESS_TABLE + " values ('testUpsertSelectFailure', 'a')",
+                                       UPSERT_SELECT_TO_FAIL),
                                        transactional ? new int[] {0,1} : new int[]{1}, true, 
                                        newArrayList("select count(*) from " + A_SUCESS_TABLE + " where k in ('testUpsertSelectFailure', '" + Bytes.toString(ROW_TO_FAIL_UPSERT_BYTES) + "')",
                                                     "select count(*) from " + B_FAILURE_TABLE + " where k = '" + Bytes.toString(ROW_TO_FAIL_UPSERT_BYTES) + "'"),
@@ -200,9 +200,9 @@ public class PartialCommitIT extends BaseOwnClusterIT {
     
     @Test
     public void testDeleteFailure() {
-        testPartialCommit(newArrayList("upsert into " + A_SUCESS_TABLE + " values ('testDeleteFailure1', 'a')", 
+        testPartialCommit(newArrayList("upsert into " + A_SUCESS_TABLE + " values ('testDeleteFailure1', 'a')",
                                        DELETE_TO_FAIL,
-                                       "upsert into " + A_SUCESS_TABLE + " values ('testDeleteFailure2', 'b')"), 
+                                       "upsert into " + A_SUCESS_TABLE + " values ('testDeleteFailure2', 'b')"),
                                        transactional ? new int[] {0,1,2} : new int[]{1}, true, 
                                        newArrayList("select count(*) from " + A_SUCESS_TABLE + " where k like 'testDeleteFailure_'",
                                                     "select count(*) from " + B_FAILURE_TABLE + " where k = 'z'"),
@@ -215,7 +215,7 @@ public class PartialCommitIT extends BaseOwnClusterIT {
     @Test
     public void testOrderOfMutationsIsPredicatable() {
         testPartialCommit(newArrayList("upsert into " + C_SUCESS_TABLE + " values ('testOrderOfMutationsIsPredicatable', 'c')", // will fail because c_success_table is after b_failure_table by table sort order
-                                       UPSERT_TO_FAIL, 
+                                       UPSERT_TO_FAIL,
                                        "upsert into " + A_SUCESS_TABLE + " values ('testOrderOfMutationsIsPredicatable', 'a')"), // will succeed because a_success_table is before b_failure_table by table sort order
                                        transactional ? new int[] {0,1,2} : new int[]{0,1}, true, 
                                        newArrayList("select count(*) from " + C_SUCESS_TABLE + " where k='testOrderOfMutationsIsPredicatable'",
@@ -226,11 +226,11 @@ public class PartialCommitIT extends BaseOwnClusterIT {
     
     @Test
     public void testStatementOrderMaintainedInConnection() {
-        testPartialCommit(newArrayList("upsert into " + A_SUCESS_TABLE + " values ('testStatementOrderMaintainedInConnection', 'a')", 
+        testPartialCommit(newArrayList("upsert into " + A_SUCESS_TABLE + " values ('testStatementOrderMaintainedInConnection', 'a')",
                                        "upsert into " + A_SUCESS_TABLE + " select k, c from " + C_SUCESS_TABLE,
                                        DELETE_TO_FAIL,
-                                       "select * from " + A_SUCESS_TABLE + "", 
-                                       UPSERT_TO_FAIL), 
+                                       "select * from " + A_SUCESS_TABLE + "",
+                                       UPSERT_TO_FAIL),
                                        transactional ? new int[] {0,1,2,4} : new int[]{2,4}, true, 
                                        newArrayList("select count(*) from " + A_SUCESS_TABLE + " where k='testStatementOrderMaintainedInConnection' or k like 'z%'", // rows left: zz, zzz, checkThatAllStatementTypesMaintainOrderInConnection
                                                     "select count(*) from " + B_FAILURE_TABLE + " where k = '" + Bytes.toString(ROW_TO_FAIL_UPSERT_BYTES) + "'",
@@ -289,7 +289,7 @@ public class PartialCommitIT extends BaseOwnClusterIT {
         // passing a null mutation state forces the connection.newMutationState() to be used to create the MutationState
         return new PhoenixConnection(phxCon, null) {
             @Override
-            protected MutationState newMutationState(int maxSize, int maxSizeBytes) {
+            protected MutationState newMutationState(int maxSize, long maxSizeBytes) {
                 return new MutationState(maxSize, maxSizeBytes, this, mutations, false, null);
             };
         };
